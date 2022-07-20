@@ -1,6 +1,5 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { ModuleFederationPlugin } = require("webpack").container;
-const ExternalTemplateRemotesPlugin = require("external-remotes-plugin");
 const path = require("path");
 
 module.exports = {
@@ -8,7 +7,7 @@ module.exports = {
   mode: "development",
   devServer: {
     static: path.join(__dirname, "dist"),
-    port: 3001,
+    port: 3003,
   },
   output: {
     publicPath: "auto",
@@ -26,15 +25,15 @@ module.exports = {
     ],
   },
   plugins: [
+    // To learn more about the usage of this plugin, please visit https://webpack.js.org/plugins/module-federation-plugin/
     new ModuleFederationPlugin({
-      name: "app1",
-      remotes: {
-        app2: "app2@[app2Url]/remoteEntry.js",
-        app3: "app3@[app3Url]/remoteEntry.js",
-        app4: "app4@[app4Url]/remoteEntry.js",
-      },
+      name: "app3",
+      filename: "remoteEntry.js",
       exposes: {
-        "./EventBus": "./src/EventBus.js",
+        "./App": "./src/App",
+      },
+      remotes: {
+        app1: "app1@[app1Url]/remoteEntry.js",
       },
       shared: {
         react: { singleton: true },
@@ -42,7 +41,6 @@ module.exports = {
         rxjs: { singleton: true },
       },
     }),
-    new ExternalTemplateRemotesPlugin(),
     new HtmlWebpackPlugin({
       template: "./public/index.html",
     }),
